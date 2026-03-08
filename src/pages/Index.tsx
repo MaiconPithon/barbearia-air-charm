@@ -5,7 +5,6 @@ import { useBusinessSettings } from "@/hooks/useBusinessSettings";
 import { useReviews } from "@/hooks/useReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Scissors, Star, MapPin, Clock, Phone, ChevronUp } from "lucide-react";
-import defaultBg from "@/assets/default-bg.jpg";
 import defaultLogo from "@/assets/default-logo.jpeg";
 import { useEffect } from "react";
 
@@ -16,7 +15,7 @@ const Index = () => {
 
   const businessName = settings?.business_name || "Barbearia";
   const address = settings?.address || "";
-  const bgImage = settings?.background_url || defaultBg;
+  const bgImage = settings?.background_url || "";
   const logoUrl = settings?.logo_url;
   const contactPhone = (settings?.phone_number || settings?.whatsapp || "").replace(/\D/g, "");
   const avgRating = reviews?.length
@@ -42,15 +41,19 @@ const Index = () => {
   return (
     <div className="dark min-h-screen bg-background text-foreground relative" style={settings?.bg_color ? { backgroundColor: settings.bg_color } : undefined}>
       {/* Full-screen background */}
-      <div
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: `url(${bgImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center center",
-          backgroundRepeat: "no-repeat",
-        }}
-      />
+      {bgImage ? (
+        <div
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundImage: `url(${bgImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center center",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
+      ) : (
+        <div className="fixed inset-0 z-0 bg-neutral-900" />
+      )}
       <div className="fixed inset-0 z-0 bg-black/40" />
 
       {/* Hero */}
