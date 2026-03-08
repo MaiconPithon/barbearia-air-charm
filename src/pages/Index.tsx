@@ -80,7 +80,7 @@ const Index = () => {
             <Button
               size="lg"
               className="w-full rounded-2xl h-12 text-base font-black gap-2 transition-all active:scale-95 shadow-lg"
-              style={{ backgroundColor: primaryColor, color: "#000" }}
+              style={{ backgroundColor: primaryColor, color: "#fff" }}
             >
               <Scissors className="h-4 w-4 transition-transform group-hover:rotate-12" /> AGENDAR HORÁRIO
             </Button>
@@ -106,26 +106,6 @@ const Index = () => {
             )}
           </div>
 
-          {/* Reviews section — stars only, minimal */}
-          {reviews && reviews.length > 0 && (
-            <div className="w-full max-w-xs">
-              <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] font-bold mb-2">Avaliações</p>
-              <div className="flex gap-2 overflow-x-auto pb-1 justify-center" style={{ scrollbarWidth: "none" }}>
-                {reviews.slice(0, 6).map((r) => (
-                  <div
-                    key={r.id}
-                    className="shrink-0 bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-2 flex items-center justify-center"
-                  >
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: r.stars }).map((_, i) => (
-                        <Star key={i} className="h-2.5 w-2.5 fill-yellow-500 text-yellow-500" />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Footer Area */}
