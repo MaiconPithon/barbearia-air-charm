@@ -272,13 +272,10 @@ const MeusAgendamentos = () => {
                 )}
 
                 {/* Footer link */}
-                <div className="text-center pt-8 pb-4 space-y-3">
+                <div className="text-center pt-8 pb-4">
                     <Link to="/agendar" className="text-[11px] text-white/20 hover:text-[#D1B122] transition-colors uppercase font-black tracking-[0.2em]">
                         Fazer novo agendamento
                     </Link>
-                    <p className="text-[9px] text-white/15 font-medium tracking-[0.15em] select-none">
-                        Desenvolvido por Michael Pithon
-                    </p>
                 </div>
             </div>
         </div>

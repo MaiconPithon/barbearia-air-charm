@@ -3,7 +3,7 @@ import { useBusinessSettings } from "@/hooks/useBusinessSettings";
 
 export function WhatsAppButton() {
   const { data: settings } = useBusinessSettings();
-  const phone = settings?.whatsapp || "";
+  const phone = (settings?.phone_number || settings?.whatsapp || "").replace(/\D/g, "");
 
   if (!phone) return null;
 

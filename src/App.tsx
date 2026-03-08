@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { FooterSignature } from "@/components/FooterSignature";
 import Index from "./pages/Index";
 import Agendar from "./pages/Agendar";
 import AdminLogin from "./pages/AdminLogin";
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <FooterSignature />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

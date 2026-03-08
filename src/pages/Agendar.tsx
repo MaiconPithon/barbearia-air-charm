@@ -167,8 +167,7 @@ const Agendar = () => {
       const timeStr = selectedTime + ":00";
       const serviceNames = chosen.map((s) => s.name);
 
-      // Try bookings table first
-      const bookingResult = await (supabase.from("bookings" as any) as any).insert({
+      const { error } = await (supabase.from("bookings" as any) as any).insert({
         client_name: clientName,
         client_phone: clientPhone,
         booking_date: dateStr,
@@ -178,30 +177,13 @@ const Agendar = () => {
         payment_method: dbPaymentMethod,
         total_price: totalPrice,
         total_duration: totalDuration,
+        status: "pendente",
       });
 
-      let finalError = bookingResult.error;
-
-      // If bookings table fails for ANY reason, fallback to appointments
-      if (finalError) {
-        const apptResult = await supabase.from("appointments").insert({
-          client_name: clientName,
-          client_phone: clientPhone,
-          service_ids: selectedServices,
-          service_names: serviceNames,
-          appointment_date: dateStr,
-          appointment_time: timeStr,
-          payment_method: dbPaymentMethod,
-          total_price: totalPrice,
-          total_duration: totalDuration,
-        });
-        finalError = apptResult.error;
-      }
-
-      if (finalError) throw finalError;
+      if (error) throw error;
 
       // Send WhatsApp confirmation
-      const rawWhatsapp = settings?.whatsapp || "";
+      const rawWhatsapp = settings?.phone_number || settings?.whatsapp || "";
       const whatsappNumber = rawWhatsapp.replace(/\D/g, "");
       const dateFormatted = selectedDate ? format(selectedDate, "dd/MM/yyyy") : "";
       const servicesList = serviceNames.join(", ");
@@ -225,10 +207,10 @@ const Agendar = () => {
 
   const handleRate = async (stars: number) => {
     setRating(stars);
-    // Try reviews table first, fall back to avaliacoes
     const { error } = await supabase.from("reviews" as any).insert({ client_name: clientName, stars });
     if (error) {
-      await supabase.from("avaliacoes").insert({ client_name: clientName, stars });
+      toast.error("Não foi possível salvar a avaliação.");
+      return;
     }
     toast.success("Avaliação recebida! Muito obrigado. ⭐");
   };
@@ -665,12 +647,6 @@ const Agendar = () => {
 
       <WhatsAppButton />
 
-      {/* Developer Signature */}
-      <div className="fixed bottom-1 left-0 right-0 z-10 text-center pointer-events-none select-none opacity-30">
-        <span className="text-[8px] text-white font-medium tracking-widest uppercase">
-          Desenvolvido por Michael Pithon
-        </span>
-      </div>
     </div>
   );
 };

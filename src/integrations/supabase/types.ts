@@ -107,6 +107,51 @@ export type Database = {
         }
         Relationships: []
       }
+      bookings: {
+        Row: {
+          booking_date: string
+          booking_time: string
+          client_name: string
+          client_phone: string
+          created_at: string
+          id: string
+          payment_method: string | null
+          service_ids: string[]
+          service_names: string[]
+          status: string
+          total_duration: number
+          total_price: number
+        }
+        Insert: {
+          booking_date: string
+          booking_time: string
+          client_name: string
+          client_phone: string
+          created_at?: string
+          id?: string
+          payment_method?: string | null
+          service_ids: string[]
+          service_names?: string[]
+          status?: string
+          total_duration?: number
+          total_price?: number
+        }
+        Update: {
+          booking_date?: string
+          booking_time?: string
+          client_name?: string
+          client_phone?: string
+          created_at?: string
+          id?: string
+          payment_method?: string | null
+          service_ids?: string[]
+          service_names?: string[]
+          status?: string
+          total_duration?: number
+          total_price?: number
+        }
+        Relationships: []
+      }
       business_settings: {
         Row: {
           key: string
@@ -122,6 +167,27 @@ export type Database = {
           key?: string
           updated_at?: string
           value?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          client_name: string
+          created_at: string
+          id: string
+          stars: number
+        }
+        Insert: {
+          client_name: string
+          created_at?: string
+          id?: string
+          stars: number
+        }
+        Update: {
+          client_name?: string
+          created_at?: string
+          id?: string
+          stars?: number
         }
         Relationships: []
       }
