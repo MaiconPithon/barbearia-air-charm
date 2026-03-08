@@ -18,6 +18,7 @@ const Index = () => {
   const address = settings?.address || "";
   const bgImage = settings?.background_url || defaultBg;
   const logoUrl = settings?.logo_url;
+  const contactPhone = (settings?.phone_number || settings?.whatsapp || "").replace(/\D/g, "");
   const avgRating = reviews?.length
     ? reviews.reduce((sum, a) => sum + a.stars, 0) / reviews.length
     : 0;
