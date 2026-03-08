@@ -14,7 +14,7 @@ const Index = () => {
   const { data: settings } = useBusinessSettings();
   const { data: reviews } = useReviews();
 
-  const businessName = settings?.business_name || "Barbearia Air Charm";
+  const businessName = settings?.business_name || "Barbearia";
   const address = settings?.address || "";
   const bgImage = settings?.background_url || defaultBg;
   const logoUrl = settings?.logo_url;
@@ -63,6 +63,11 @@ const Index = () => {
             alt={businessName}
             className="h-24 w-auto md:h-32 object-contain mb-4"
           />
+
+          {/* Business Name */}
+          <h1 className="text-xl md:text-2xl font-black text-white uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] mb-2">
+            {businessName}
+          </h1>
 
           {/* Star rating badge */}
           {reviews && reviews.length > 0 && (
