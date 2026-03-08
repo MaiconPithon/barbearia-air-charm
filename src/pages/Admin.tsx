@@ -1100,10 +1100,16 @@ const Admin = () => {
                   </Button>
                 </div>
 
-                <div>
-                  <label className="text-sm font-semibold mb-1 block">WhatsApp</label>
-                  <Input value={settingsLocal.whatsapp || ""} onChange={(e) => setSettingsLocal(prev => ({ ...prev, whatsapp: e.target.value }))} placeholder="5571999999999" className="bg-background" />
-                  <Button className="mt-2" size="sm" onClick={() => saveSetting("whatsapp")}>Salvar</Button>
+                <div className="rounded-lg border border-border bg-background/50 p-4 space-y-4">
+                  <h4 className="text-sm font-bold text-primary flex items-center gap-2">
+                    <Phone className="h-4 w-4" /> Informações de Contato
+                  </h4>
+                  <div>
+                    <label className="text-sm font-semibold mb-1 block">Número de Celular / WhatsApp</label>
+                    <p className="text-xs text-muted-foreground mb-1">Usado no botão flutuante do WhatsApp e exibido na página inicial.</p>
+                    <Input value={settingsLocal.whatsapp || ""} onChange={(e) => setSettingsLocal(prev => ({ ...prev, whatsapp: e.target.value }))} placeholder="5571999999999" className="bg-background" />
+                    <Button className="mt-2" size="sm" onClick={() => saveSetting("whatsapp")}>Salvar</Button>
+                  </div>
                 </div>
 
                 <div>

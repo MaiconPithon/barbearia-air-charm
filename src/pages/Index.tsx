@@ -92,10 +92,10 @@ const Index = () => {
               <span>Ter–Sáb · 08h às 21h</span>
             </div>
             {settings?.whatsapp && (
-              <div className="flex items-center gap-1.5">
+              <a href={`https://wa.me/${settings.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
                 <Phone className="h-3.5 w-3.5" style={{ color: primaryColor }} />
-                <span>(71) 98889-6715</span>
-              </div>
+                <span>{settings.whatsapp.replace(/^55(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3')}</span>
+              </a>
             )}
             {address && (
               <div className="flex items-center gap-1.5">
