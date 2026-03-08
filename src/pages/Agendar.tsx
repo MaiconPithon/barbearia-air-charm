@@ -207,10 +207,10 @@ const Agendar = () => {
 
   const handleRate = async (stars: number) => {
     setRating(stars);
-    // Try reviews table first, fall back to avaliacoes
     const { error } = await supabase.from("reviews" as any).insert({ client_name: clientName, stars });
     if (error) {
-      await supabase.from("avaliacoes").insert({ client_name: clientName, stars });
+      toast.error("Não foi possível salvar a avaliação.");
+      return;
     }
     toast.success("Avaliação recebida! Muito obrigado. ⭐");
   };
