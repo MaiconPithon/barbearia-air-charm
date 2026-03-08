@@ -14,7 +14,7 @@ const Index = () => {
   const { data: settings } = useBusinessSettings();
   const { data: avaliacoes } = useAvaliacoes();
 
-  const businessName = settings?.business_name || "Barbearia do Romel";
+  const businessName = settings?.business_name || "Barbearia Air Charm";
   const address = settings?.address || "";
   const bgImage = settings?.background_url || romelBg;
   const logoUrl = settings?.logo_url;
@@ -59,7 +59,7 @@ const Index = () => {
           {/* Logo - Compact */}
           <img
             src={logoUrl || romelLogo}
-            alt="Romel Barbearia"
+            alt={businessName}
             className="h-24 w-auto md:h-32 object-contain mb-4"
           />
 

@@ -172,7 +172,8 @@ const Agendar = () => {
       const whatsappNumber = settings?.whatsapp || "5571988896715";
       const dateFormatted = selectedDate ? format(selectedDate, "dd/MM/yyyy") : "";
       const servicesList = chosen.map((s) => s.name).join(", ");
-      const message = `✅ Agendamento Confirmado!\n\n📍 Barbearia Romel\n👤 Cliente: ${clientName}\n✂️ Serviço: ${servicesList}\n📅 Data: ${dateFormatted} às ${selectedTime}\n💰 Valor: R$ ${totalPrice.toFixed(2)}\n\nPor favor, envie o comprovante do Pix para garantir sua vaga!`;
+      const bName = settings?.business_name || "Barbearia Air Charm";
+      const message = `✅ Agendamento Confirmado!\n\n📍 ${bName}\n👤 Cliente: ${clientName}\n✂️ Serviço: ${servicesList}\n📅 Data: ${dateFormatted} às ${selectedTime}\n💰 Valor: R$ ${totalPrice.toFixed(2)}\n\nPor favor, envie o comprovante do Pix para garantir sua vaga!`;
 
       const waUrl = `https://wa.me/5571988896715?text=${encodeURIComponent(message)}`;
       window.open(waUrl, "_blank", "noopener,noreferrer");
@@ -240,7 +241,7 @@ const Agendar = () => {
         {/* Top bar */}
         <div className="px-4 pt-4">
           <button onClick={step === "done" ? () => navigate("/") : goBack} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground font-semibold uppercase tracking-wider">
-            <ArrowLeft className="h-4 w-4" /> Romel Barbearia
+            <ArrowLeft className="h-4 w-4" /> {settings?.business_name || "Barbearia Air Charm"}
           </button>
         </div>
 
@@ -539,7 +540,7 @@ const Agendar = () => {
           {/* Step: Done */}
           {step === "done" && (
             <div className="flex flex-col items-center gap-4 text-center">
-              <img src={romelLogo} alt="Romel Barbearia" className="h-20 w-20 object-contain" />
+              <img src={settings?.logo_url || romelLogo} alt={settings?.business_name || "Barbearia Air Charm"} className="h-20 w-20 object-contain" />
               <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 -mt-4" style={{ borderColor: primaryColor, backgroundColor: `${primaryColor}33` }}>
                 <Check className="h-6 w-6" style={{ color: primaryColor }} />
               </div>
