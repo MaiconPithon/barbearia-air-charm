@@ -5,8 +5,8 @@ import { useBusinessSettings } from "@/hooks/useBusinessSettings";
 import { useAvaliacoes } from "@/hooks/useAvaliacoes";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Scissors, Star, MapPin, Clock, Phone, ChevronUp } from "lucide-react";
-import romelBg from "@/assets/romel-bg.jpg";
-import romelLogo from "@/assets/romel-logo.jpeg";
+import defaultBg from "@/assets/default-bg.jpg";
+import defaultLogo from "@/assets/default-logo.jpeg";
 import { useEffect } from "react";
 
 const Index = () => {
@@ -16,7 +16,7 @@ const Index = () => {
 
   const businessName = settings?.business_name || "Barbearia Air Charm";
   const address = settings?.address || "";
-  const bgImage = settings?.background_url || romelBg;
+  const bgImage = settings?.background_url || defaultBg;
   const logoUrl = settings?.logo_url;
   const avgRating = avaliacoes?.length
     ? avaliacoes.reduce((sum, a) => sum + a.stars, 0) / avaliacoes.length
@@ -58,7 +58,7 @@ const Index = () => {
         <div className="flex flex-col items-center justify-center w-full max-w-sm animate-in fade-in zoom-in duration-1000">
           {/* Logo - Compact */}
           <img
-            src={logoUrl || romelLogo}
+            src={logoUrl || defaultLogo}
             alt={businessName}
             className="h-24 w-auto md:h-32 object-contain mb-4"
           />

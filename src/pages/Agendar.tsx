@@ -18,8 +18,8 @@ import { ptBR } from "date-fns/locale";
 import { ArrowLeft, Check, ChevronRight, MessageCircle, Clock, Copy, X } from "lucide-react";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
-import romelBg from "@/assets/romel-bg.jpg";
-import romelLogo from "@/assets/romel-logo.jpeg";
+import defaultBg from "@/assets/default-bg.jpg";
+import defaultLogo from "@/assets/default-logo.jpeg";
 
 type Step = "service" | "date" | "time" | "info" | "payment" | "confirm" | "done";
 
@@ -55,6 +55,15 @@ const Agendar = () => {
   // Get buffer from settings or default 45 min
   const bufferMinutes = settings?.buffer_minutes ? parseInt(settings.buffer_minutes) : 45;
   const primaryColor = settings?.primary_color || "#d1b122";
+  const bgImage = settings?.background_url || defaultBg;
+
+  // Sync CSS custom properties so colors update in real time from Admin
+  useEffect(() => {
+    document.documentElement.style.setProperty("--dynamic-primary", primaryColor);
+    return () => {
+      document.documentElement.style.removeProperty("--dynamic-primary");
+    };
+  }, [primaryColor]);
 
   // Generate time slots with availability info
   type SlotInfo = { time: string; available: boolean; reason?: string };
@@ -153,7 +162,8 @@ const Agendar = () => {
   const handleSubmit = async () => {
     setSaving(true);
     try {
-      const dbPaymentMethod = paymentMethod === "pix" ? "Pix" : "Dinheiro";
+      // Send lowercase payment method to match DB trigger validation
+      const dbPaymentMethod = paymentMethod === "pix" ? "pix" : "dinheiro";
 
       const { error } = await supabase.from("appointments").insert({
         client_name: clientName,
@@ -166,21 +176,30 @@ const Agendar = () => {
         total_price: totalPrice,
         total_duration: totalDuration,
       });
-      if (error) throw error;
+
+      if (error) {
+        console.error("Erro ao agendar - detalhes:", JSON.stringify(error));
+        throw error;
+      }
 
       // Redirect to WhatsApp with confirmation message
-      const whatsappNumber = settings?.whatsapp || "5571988896715";
+      const rawWhatsapp = settings?.whatsapp || "";
+      const whatsappNumber = rawWhatsapp.replace(/\D/g, "");
       const dateFormatted = selectedDate ? format(selectedDate, "dd/MM/yyyy") : "";
       const servicesList = chosen.map((s) => s.name).join(", ");
       const bName = settings?.business_name || "Barbearia Air Charm";
-      const message = `✅ Agendamento Confirmado!\n\n📍 ${bName}\n👤 Cliente: ${clientName}\n✂️ Serviço: ${servicesList}\n📅 Data: ${dateFormatted} às ${selectedTime}\n💰 Valor: R$ ${totalPrice.toFixed(2)}\n\nPor favor, envie o comprovante do Pix para garantir sua vaga!`;
+      const payLabel = paymentMethod === "pix" ? "Pix" : "Dinheiro";
+      const message = `✅ Agendamento Confirmado!\n\n📍 ${bName}\n👤 Cliente: ${clientName}\n✂️ Serviço: ${servicesList}\n📅 Data: ${dateFormatted} às ${selectedTime}\n💰 Valor: R$ ${totalPrice.toFixed(2)}\n💳 Pagamento: ${payLabel}\n\nPor favor, envie o comprovante do Pix para garantir sua vaga!`;
 
-      const waUrl = `https://wa.me/5571988896715?text=${encodeURIComponent(message)}`;
-      window.open(waUrl, "_blank", "noopener,noreferrer");
+      if (whatsappNumber) {
+        const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        window.open(waUrl, "_blank", "noopener,noreferrer");
+      }
 
       setStep("done");
-    } catch {
-      toast.error("Erro ao agendar. Tente novamente.");
+    } catch (err: any) {
+      const detail = err?.message || err?.details || "Tente novamente.";
+      toast.error(`Erro ao agendar: ${detail}`);
     } finally {
       setSaving(false);
     }
@@ -233,7 +252,7 @@ const Agendar = () => {
       {/* Background image */}
       <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-30"
-        style={{ backgroundImage: `url(${romelBg})` }}
+        style={{ backgroundImage: `url(${bgImage})` }}
       />
       <div className="fixed inset-0 z-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
 
@@ -494,10 +513,30 @@ const Agendar = () => {
                     <div className="bg-white p-3 rounded-lg">
                       <QRCodeSVG
                         value={(() => {
-                          // Build dynamic BR Code payload with value
                           const valorStr = totalPrice.toFixed(2);
                           const valorTag = `54${String(valorStr.length).padStart(2, "0")}${valorStr}`;
-                          return `00020126440014BR.GOV.BCB.PIX0122romel.cruz@hotmail.com5204000053039865${valorTag}5802BR5925Romel da Cruz Mascarenhas6008SALVADOR62140510iY2ZGjlaHK6304`;
+                          const pixKey = settings?.pix_key || "";
+                          const pixName = (settings?.business_name || "Barbearia").substring(0, 25).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                          if (!pixKey) return "";
+
+                          const formatLen = (s: string) => String(s.length).padStart(2, "0");
+                          const accInfo = `0014BR.GOV.BCB.PIX01${formatLen(pixKey)}${pixKey}`;
+                          const payload = `00020126${formatLen(accInfo)}${accInfo}5204000053039865${valorTag}5802BR59${formatLen(pixName)}${pixName}6008SALVADOR62140510iY2ZGjlaHK6304`;
+
+                          // Convert to CRC16
+                          let crc = 0xFFFF;
+                          for (let i = 0; i < payload.length; i++) {
+                            crc ^= payload.charCodeAt(i) << 8;
+                            for (let j = 0; j < 8; j++) {
+                              if ((crc & 0x8000) !== 0) {
+                                crc = (crc << 1) ^ 0x1021;
+                              } else {
+                                crc = crc << 1;
+                              }
+                            }
+                          }
+                          const crcHex = (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+                          return payload + crcHex;
                         })()}
                         size={200}
                       />
@@ -506,11 +545,15 @@ const Agendar = () => {
 
                   {/* Chave Pix visível */}
                   <div className="rounded-lg bg-zinc-800 p-3 flex items-center justify-between gap-2">
-                    <span className="text-sm text-zinc-300 truncate">romel.cruz@hotmail.com</span>
+                    <span className="text-sm text-zinc-300 truncate">{settings?.pix_key || "Chave PIX não configurada"}</span>
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText("romel.cruz@hotmail.com");
-                        toast.success("Chave Pix copiada!");
+                        if (settings?.pix_key) {
+                          navigator.clipboard.writeText(settings.pix_key);
+                          toast.success("Chave Pix copiada!");
+                        } else {
+                          toast.error("Nenhuma chave pix disponível.");
+                        }
                       }}
                       className="shrink-0 rounded-lg bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 text-sm font-bold transition-colors flex items-center gap-1"
                     >
@@ -540,7 +583,7 @@ const Agendar = () => {
           {/* Step: Done */}
           {step === "done" && (
             <div className="flex flex-col items-center gap-4 text-center">
-              <img src={settings?.logo_url || romelLogo} alt={settings?.business_name || "Barbearia Air Charm"} className="h-20 w-20 object-contain" />
+              <img src={settings?.logo_url || defaultLogo} alt={settings?.business_name || "Barbearia Air Charm"} className="h-20 w-20 object-contain" />
               <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 -mt-4" style={{ borderColor: primaryColor, backgroundColor: `${primaryColor}33` }}>
                 <Check className="h-6 w-6" style={{ color: primaryColor }} />
               </div>
@@ -599,6 +642,13 @@ const Agendar = () => {
       </div>
 
       <WhatsAppButton />
+
+      {/* Developer Signature */}
+      <div className="fixed bottom-1 left-0 right-0 z-10 text-center pointer-events-none select-none opacity-30">
+        <span className="text-[8px] text-white font-medium tracking-widest uppercase">
+          Desenvolvido por Michael Pithon
+        </span>
+      </div>
     </div>
   );
 };
