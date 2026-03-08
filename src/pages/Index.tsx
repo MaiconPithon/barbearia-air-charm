@@ -131,15 +131,6 @@ const Index = () => {
 
         {/* Footer Area */}
         <div className="absolute bottom-0 left-0 w-full flex flex-col items-center">
-          {/* Developer Signature */}
-          <div className="flex flex-col items-center gap-1 mb-8 opacity-30 select-none">
-            <Link to="/admin/login" className="text-[9px] hover:text-white transition-colors font-bold uppercase tracking-[0.3em]">
-              Área do Barbeiro
-            </Link>
-            <span className="text-[9px] font-medium tracking-[0.1em]">
-              Desenvolvido por Michael Pithon
-            </span>
-          </div>
 
           {/* Bottom Tab - Meus Agendamentos */}
           <Link to="/meus-agendamentos" className="w-auto transform transition-transform hover:-translate-y-1 active:scale-95">
