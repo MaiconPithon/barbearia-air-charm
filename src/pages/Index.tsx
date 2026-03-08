@@ -80,7 +80,7 @@ const Index = () => {
             <Button
               size="lg"
               className="w-full rounded-2xl h-12 text-base font-black gap-2 transition-all active:scale-95 shadow-lg"
-              style={{ backgroundColor: primaryColor, color: "#000" }}
+              style={{ backgroundColor: primaryColor, color: "#fff" }}
             >
               <Scissors className="h-4 w-4 transition-transform group-hover:rotate-12" /> AGENDAR HORÁRIO
             </Button>
