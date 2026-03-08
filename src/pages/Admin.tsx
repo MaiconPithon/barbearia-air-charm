@@ -335,7 +335,7 @@ const Admin = () => {
     }
   };
 
-  const businessName = settings?.business_name || "Barbearia do Romel";
+  const businessName = settings?.business_name || "Barbearia Air Charm";
   const primaryColor = settings?.primary_color || "#d1b122";
 
   return (
