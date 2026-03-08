@@ -109,16 +109,16 @@ const Index = () => {
           {/* Reviews section — compact horizontal scroll list */}
           {reviews && reviews.length > 0 && (
             <div className="w-full max-w-xs">
-              <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] font-bold mb-2">O que dizem</p>
+              <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] font-bold mb-2">Avaliações</p>
               <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
                 {reviews.slice(0, 6).map((r) => (
                   <div
                     key={r.id}
-                    className="shrink-0 bg-black/30 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-2 flex flex-col items-center min-w-[80px]"
+                    className="shrink-0 bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-2 flex flex-col items-center min-w-[80px]"
                   >
                     <div className="flex gap-0.5 mb-1">
                       {Array.from({ length: r.stars }).map((_, i) => (
-                        <Star key={i} className="h-2.5 w-2.5 fill-yellow-500 text-yellow-500" />
+                        <Star key={i} className="h-2 w-2 fill-yellow-500 text-yellow-500" />
                       ))}
                     </div>
                     <span className="text-[9px] text-white/60 font-medium truncate max-w-[70px]">{r.client_name}</span>
