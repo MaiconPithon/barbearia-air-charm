@@ -162,16 +162,16 @@ const Agendar = () => {
   const handleSubmit = async () => {
     setSaving(true);
     try {
-      // Send lowercase payment method to match DB trigger validation
       const dbPaymentMethod = paymentMethod === "pix" ? "pix" : "dinheiro";
 
-      const { error } = await supabase.from("appointments").insert({
+      // Use bookings table with correct column names
+      const { error } = await supabase.from("bookings" as any).insert({
         client_name: clientName,
         client_phone: clientPhone,
+        booking_date: format(selectedDate!, "yyyy-MM-dd"),
+        booking_time: selectedTime + ":00",
         service_ids: selectedServices,
         service_names: chosen.map((s) => s.name),
-        appointment_date: format(selectedDate!, "yyyy-MM-dd"),
-        appointment_time: selectedTime + ":00",
         payment_method: dbPaymentMethod,
         total_price: totalPrice,
         total_duration: totalDuration,
@@ -207,7 +207,11 @@ const Agendar = () => {
 
   const handleRate = async (stars: number) => {
     setRating(stars);
-    await supabase.from("avaliacoes").insert({ client_name: clientName, stars });
+    // Try reviews table first, fall back to avaliacoes
+    const { error } = await supabase.from("reviews" as any).insert({ client_name: clientName, stars });
+    if (error) {
+      await supabase.from("avaliacoes").insert({ client_name: clientName, stars });
+    }
     toast.success("Avaliação recebida! Muito obrigado. ⭐");
   };
 

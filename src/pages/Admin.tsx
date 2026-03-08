@@ -100,7 +100,7 @@ const Admin = () => {
 
   // Appointment actions
   const updateStatus = async (id: string, status: string) => {
-    const { error } = await supabase.from("appointments").update({ status }).eq("id", id);
+    const { error } = await supabase.from("bookings" as any).update({ status }).eq("id", id);
     if (error) {
       toast.error("Erro ao atualizar status: " + error.message);
       return;
@@ -112,7 +112,7 @@ const Admin = () => {
   // Toggle payment_method between 'plano' and the previous method (null/dinheiro)
   const togglePlanPayment = async (id: string, isCurrentlyPlano: boolean) => {
     const { error } = await supabase
-      .from("appointments")
+      .from("bookings" as any)
       .update({ payment_method: isCurrentlyPlano ? null : "plano" })
       .eq("id", id);
     if (error) {
@@ -124,7 +124,7 @@ const Admin = () => {
   };
 
   const deleteAppointment = async (id: string) => {
-    await supabase.from("appointments").delete().eq("id", id);
+    await supabase.from("bookings" as any).delete().eq("id", id);
     refetchAppts();
     toast.success("Agendamento removido.");
   };
@@ -158,7 +158,7 @@ const Admin = () => {
     const totalPrice = catalogServices.reduce((sum, s) => sum + Number(s.price), 0) + customServices.reduce((sum, s) => sum + s.price, 0);
     const totalDuration = catalogServices.reduce((sum, s) => sum + s.duration, 0);
 
-    await supabase.from("appointments").update({
+    await supabase.from("bookings" as any).update({
       service_ids: editServiceIds,
       service_names: allNames,
       total_price: totalPrice,
@@ -274,16 +274,16 @@ const Admin = () => {
     const totalDuration = catalogChosen.reduce((sum, s) => sum + s.duration, 0);
     const quickSalePaymentMethod =
       qsPaymentStatus === "plano" ? "plano" :
-      qsPaymentStatus === "pago" ? "Dinheiro" :
-      null;
+        qsPaymentStatus === "pago" ? "Dinheiro" :
+          null;
 
-    await supabase.from("appointments").insert({
+    await supabase.from("bookings" as any).insert({
       client_name: qsName || "Venda Rápida",
       client_phone: "N/A",
       service_ids: qsServiceIds,
       service_names: allNames,
-      appointment_date: qsDate,
-      appointment_time: `${qsHour}:${qsMinute}:00`,
+      booking_date: qsDate,
+      booking_time: `${qsHour}:${qsMinute}:00`,
       status: qsPaymentStatus === "pago" ? "finalizado" : qsPaymentStatus === "plano" ? "finalizado" : "pendente",
       payment_method: quickSalePaymentMethod,
       total_price: qsTotalPrice,

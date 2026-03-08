@@ -48,13 +48,13 @@ const MeusAgendamentos = () => {
         try {
             const today = format(new Date(), "yyyy-MM-dd");
             const { data, error } = await supabase
-                .from("appointments")
+                .from("bookings" as any)
                 .select("*")
                 .ilike("client_phone", `%${phone.trim().replace(/\D/g, "")}%`)
                 .neq("status", "cancelado")
-                .gte("appointment_date", today)
-                .order("appointment_date")
-                .order("appointment_time");
+                .gte("booking_date", today)
+                .order("booking_date")
+                .order("booking_time");
             if (error) throw error;
             setAppointments(data || []);
             setSearched(true);
@@ -66,7 +66,7 @@ const MeusAgendamentos = () => {
     };
 
     const canCancel = (appt: any): { allowed: boolean; reason?: string } => {
-        const apptDateTime = new Date(`${appt.appointment_date}T${appt.appointment_time}`);
+        const apptDateTime = new Date(`${appt.booking_date ?? appt.appointment_date}T${appt.booking_time ?? appt.appointment_time}`);
         const now = new Date();
         const minutesUntil = differenceInMinutes(apptDateTime, now);
 
@@ -97,13 +97,13 @@ const MeusAgendamentos = () => {
         setLoadingId(appt.id);
         try {
             const { error } = await supabase
-                .from("appointments")
+                .from("bookings" as any)
                 .update({ status: "cancelado" })
                 .eq("id", appt.id);
             if (error) throw error;
 
             // Invalidate queries to ensure instant slot release in the booking flow
-            queryClient.invalidateQueries({ queryKey: ["appointments"] });
+            queryClient.invalidateQueries({ queryKey: ["bookings"] });
 
             setAppointments(prev => prev.filter(a => a.id !== appt.id));
             toast.success("Agendamento cancelado! O horário foi liberado.");
@@ -123,13 +123,13 @@ const MeusAgendamentos = () => {
         setLoadingId(appt.id);
         try {
             const { error } = await supabase
-                .from("appointments")
+                .from("bookings" as any)
                 .update({ status: "cancelado" })
                 .eq("id", appt.id);
             if (error) throw error;
 
             // Invalidate queries
-            queryClient.invalidateQueries({ queryKey: ["appointments"] });
+            queryClient.invalidateQueries({ queryKey: ["bookings"] });
 
             const params = new URLSearchParams({
                 nome: appt.client_name || "",
@@ -230,7 +230,7 @@ const MeusAgendamentos = () => {
                                         <div className="space-y-1">
                                             <h4 className="text-lg font-black text-white tracking-tight uppercase">{appt.client_name}</h4>
                                             <div className="flex flex-col gap-0.5 text-white/50 font-medium text-[13px]">
-                                                <span>{format(parseISO(appt.appointment_date), "dd/MM/yyyy")} · {appt.appointment_time.substring(0, 5)}</span>
+                                                <span>{format(parseISO(appt.booking_date ?? appt.appointment_date), "dd/MM/yyyy")} · {(appt.booking_time ?? appt.appointment_time).substring(0, 5)}</span>
                                                 <span className="text-white/30">{appt.service_names?.join(" + ")}</span>
                                             </div>
                                             <div className="pt-2">
