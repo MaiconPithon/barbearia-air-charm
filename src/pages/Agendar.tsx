@@ -647,12 +647,6 @@ const Agendar = () => {
 
       <WhatsAppButton />
 
-      {/* Developer Signature */}
-      <div className="fixed bottom-1 left-0 right-0 z-10 text-center pointer-events-none select-none opacity-30">
-        <span className="text-[8px] text-white font-medium tracking-widest uppercase">
-          Desenvolvido por Michael Pithon
-        </span>
-      </div>
     </div>
   );
 };
