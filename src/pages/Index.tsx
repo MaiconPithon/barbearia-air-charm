@@ -5,7 +5,6 @@ import { useBusinessSettings } from "@/hooks/useBusinessSettings";
 import { useReviews } from "@/hooks/useReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Scissors, Star, MapPin, Clock, Phone, ChevronUp } from "lucide-react";
-import defaultBg from "@/assets/default-bg.jpg";
 import defaultLogo from "@/assets/default-logo.jpeg";
 import { useEffect } from "react";
 
