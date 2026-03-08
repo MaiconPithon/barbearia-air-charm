@@ -163,30 +163,63 @@ const Agendar = () => {
     setSaving(true);
     try {
       const dbPaymentMethod = paymentMethod === "pix" ? "pix" : "dinheiro";
+      const dateStr = format(selectedDate!, "yyyy-MM-dd");
+      const timeStr = selectedTime + ":00";
+      const serviceNames = chosen.map((s) => s.name);
 
-      // Use bookings table with correct column names
-      const { error } = await supabase.from("bookings" as any).insert({
+      // Attempt 1: bookings table with all fields
+      let { error } = await (supabase.from("bookings" as any) as any).insert({
         client_name: clientName,
         client_phone: clientPhone,
-        booking_date: format(selectedDate!, "yyyy-MM-dd"),
-        booking_time: selectedTime + ":00",
+        booking_date: dateStr,
+        booking_time: timeStr,
         service_ids: selectedServices,
-        service_names: chosen.map((s) => s.name),
+        service_names: serviceNames,
         payment_method: dbPaymentMethod,
         total_price: totalPrice,
         total_duration: totalDuration,
       });
 
+      // Attempt 2: bookings with minimal fields (in case some optional columns don't exist)
+      if (error && (error.code === "42703" || error.message?.includes("column"))) {
+        console.warn("Tentando insert minimal em bookings...", error.message);
+        const res2 = await (supabase.from("bookings" as any) as any).insert({
+          client_name: clientName,
+          client_phone: clientPhone,
+          booking_date: dateStr,
+          booking_time: timeStr,
+          payment_method: dbPaymentMethod,
+        });
+        error = res2.error;
+      }
+
+      // Attempt 3: appointments table fallback (with appointment_date / appointment_time naming)
+      if (error && (error.code === "42P01" || error.code === "42703")) {
+        console.warn("Tentando fallback para tabela appointments...", error.message);
+        const res3 = await supabase.from("appointments").insert({
+          client_name: clientName,
+          client_phone: clientPhone,
+          service_ids: selectedServices,
+          service_names: serviceNames,
+          appointment_date: dateStr,
+          appointment_time: timeStr,
+          payment_method: dbPaymentMethod,
+          total_price: totalPrice,
+          total_duration: totalDuration,
+        });
+        error = res3.error;
+      }
+
       if (error) {
-        console.error("Erro ao agendar - detalhes:", JSON.stringify(error));
+        console.error("Erro final ao agendar:", JSON.stringify(error));
         throw error;
       }
 
-      // Redirect to WhatsApp with confirmation message
+      // Send WhatsApp confirmation
       const rawWhatsapp = settings?.whatsapp || "";
       const whatsappNumber = rawWhatsapp.replace(/\D/g, "");
       const dateFormatted = selectedDate ? format(selectedDate, "dd/MM/yyyy") : "";
-      const servicesList = chosen.map((s) => s.name).join(", ");
+      const servicesList = serviceNames.join(", ");
       const bName = settings?.business_name || "Barbearia Air Charm";
       const payLabel = paymentMethod === "pix" ? "Pix" : "Dinheiro";
       const message = `✅ Agendamento Confirmado!\n\n📍 ${bName}\n👤 Cliente: ${clientName}\n✂️ Serviço: ${servicesList}\n📅 Data: ${dateFormatted} às ${selectedTime}\n💰 Valor: R$ ${totalPrice.toFixed(2)}\n💳 Pagamento: ${payLabel}\n\nPor favor, envie o comprovante do Pix para garantir sua vaga!`;
