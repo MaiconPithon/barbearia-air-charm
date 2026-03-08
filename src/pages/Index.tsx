@@ -141,6 +141,13 @@ const Index = () => {
               <span className="text-xs font-black text-white uppercase tracking-widest">Meus Agendamentos</span>
             </div>
           </Link>
+
+          {/* Developer signature */}
+          <div className="w-full text-center py-2 bg-black/80">
+            <span className="text-[8px] text-white/30 font-medium tracking-[0.18em] uppercase">
+              Desenvolvido por Michael Pithon
+            </span>
+          </div>
         </div>
       </section>
 
