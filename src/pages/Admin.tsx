@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { LogOut, Plus, Trash2, Edit2, Home, CalendarIcon, Star, DollarSign, MessageCircle, Key, Clock, Settings, Palette, Users, Zap, Filter, AlertTriangle, FileText, ClipboardList, Printer } from "lucide-react";
+import { LogOut, Plus, Trash2, Edit2, Home, CalendarIcon, Star, DollarSign, MessageCircle, Key, Clock, Settings, Palette, Users, Zap, Filter, AlertTriangle, FileText, ClipboardList, Printer, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DAY_NAMES = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
