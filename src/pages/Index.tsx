@@ -15,7 +15,7 @@ const Index = () => {
 
   const businessName = settings?.business_name || "Barbearia";
   const address = settings?.address || "";
-  const bgImage = settings?.background_url || defaultBg;
+  const bgImage = settings?.background_url || "";
   const logoUrl = settings?.logo_url;
   const contactPhone = (settings?.phone_number || settings?.whatsapp || "").replace(/\D/g, "");
   const avgRating = reviews?.length
