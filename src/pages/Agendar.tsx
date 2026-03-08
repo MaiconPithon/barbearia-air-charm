@@ -167,8 +167,7 @@ const Agendar = () => {
       const timeStr = selectedTime + ":00";
       const serviceNames = chosen.map((s) => s.name);
 
-      // Try bookings table first
-      const bookingResult = await (supabase.from("bookings" as any) as any).insert({
+      const { error } = await (supabase.from("bookings" as any) as any).insert({
         client_name: clientName,
         client_phone: clientPhone,
         booking_date: dateStr,
@@ -178,27 +177,10 @@ const Agendar = () => {
         payment_method: dbPaymentMethod,
         total_price: totalPrice,
         total_duration: totalDuration,
+        status: "pendente",
       });
 
-      let finalError = bookingResult.error;
-
-      // If bookings table fails for ANY reason, fallback to appointments
-      if (finalError) {
-        const apptResult = await supabase.from("appointments").insert({
-          client_name: clientName,
-          client_phone: clientPhone,
-          service_ids: selectedServices,
-          service_names: serviceNames,
-          appointment_date: dateStr,
-          appointment_time: timeStr,
-          payment_method: dbPaymentMethod,
-          total_price: totalPrice,
-          total_duration: totalDuration,
-        });
-        finalError = apptResult.error;
-      }
-
-      if (finalError) throw finalError;
+      if (error) throw error;
 
       // Send WhatsApp confirmation
       const rawWhatsapp = settings?.whatsapp || "";
