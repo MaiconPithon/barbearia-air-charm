@@ -14,7 +14,7 @@ const Index = () => {
   const { data: settings } = useBusinessSettings();
   const { data: reviews } = useReviews();
 
-  const businessName = settings?.business_name || "Barbearia Air Charm";
+  const businessName = settings?.business_name || "Barbearia";
   const address = settings?.address || "";
   const bgImage = settings?.background_url || defaultBg;
   const logoUrl = settings?.logo_url;
