@@ -64,6 +64,11 @@ const Index = () => {
             className="h-24 w-auto md:h-32 object-contain mb-4"
           />
 
+          {/* Business Name */}
+          <h1 className="text-xl md:text-2xl font-black text-white uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] mb-2">
+            {businessName}
+          </h1>
+
           {/* Star rating badge */}
           {reviews && reviews.length > 0 && (
             <div className="flex items-center gap-1.5 mb-4 scale-90">
