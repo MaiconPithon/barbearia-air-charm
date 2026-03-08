@@ -167,8 +167,8 @@ const Agendar = () => {
       const timeStr = selectedTime + ":00";
       const serviceNames = chosen.map((s) => s.name);
 
-      // Attempt 1: bookings table with all fields
-      let { error } = await (supabase.from("bookings" as any) as any).insert({
+      // Try bookings table first
+      const bookingResult = await (supabase.from("bookings" as any) as any).insert({
         client_name: clientName,
         client_phone: clientPhone,
         booking_date: dateStr,
@@ -180,23 +180,11 @@ const Agendar = () => {
         total_duration: totalDuration,
       });
 
-      // Attempt 2: bookings with minimal fields (in case some optional columns don't exist)
-      if (error && (error.code === "42703" || error.message?.includes("column"))) {
-        console.warn("Tentando insert minimal em bookings...", error.message);
-        const res2 = await (supabase.from("bookings" as any) as any).insert({
-          client_name: clientName,
-          client_phone: clientPhone,
-          booking_date: dateStr,
-          booking_time: timeStr,
-          payment_method: dbPaymentMethod,
-        });
-        error = res2.error;
-      }
+      let finalError = bookingResult.error;
 
-      // Attempt 3: appointments table fallback (with appointment_date / appointment_time naming)
-      if (error && (error.code === "42P01" || error.code === "42703")) {
-        console.warn("Tentando fallback para tabela appointments...", error.message);
-        const res3 = await supabase.from("appointments").insert({
+      // If bookings table fails for ANY reason, fallback to appointments
+      if (finalError) {
+        const apptResult = await supabase.from("appointments").insert({
           client_name: clientName,
           client_phone: clientPhone,
           service_ids: selectedServices,
@@ -207,13 +195,10 @@ const Agendar = () => {
           total_price: totalPrice,
           total_duration: totalDuration,
         });
-        error = res3.error;
+        finalError = apptResult.error;
       }
 
-      if (error) {
-        console.error("Erro final ao agendar:", JSON.stringify(error));
-        throw error;
-      }
+      if (finalError) throw finalError;
 
       // Send WhatsApp confirmation
       const rawWhatsapp = settings?.whatsapp || "";
