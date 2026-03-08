@@ -183,7 +183,7 @@ const Agendar = () => {
       if (error) throw error;
 
       // Send WhatsApp confirmation
-      const rawWhatsapp = settings?.whatsapp || "";
+      const rawWhatsapp = settings?.phone_number || settings?.whatsapp || "";
       const whatsappNumber = rawWhatsapp.replace(/\D/g, "");
       const dateFormatted = selectedDate ? format(selectedDate, "dd/MM/yyyy") : "";
       const servicesList = serviceNames.join(", ");

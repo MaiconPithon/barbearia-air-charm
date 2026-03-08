@@ -503,7 +503,7 @@ const Admin = () => {
                           <div className="flex gap-1">
                             {a.client_phone && a.client_phone !== "N/A" && (
                               <a
-                                href={a.status !== "cancelado" ? `https://wa.me/${a.client_phone}?text=${encodeURIComponent(`Lembrete de agendamento Olá, ${a.client_name}! Passando para confirmar seu agendamento de 💇🏽‍♂️ ${a.service_names?.join(", ")} hoje às ${a.appointment_time.substring(0, 5)}⌚ -> 💈 𝕭𝖆𝖗𝖇𝖊𝖆𝖗𝖎𝖆 𝕯𝖔 𝕽𝖔𝖒𝖊𝖑💈. Te aguardamos!`)}` : undefined}
+                                href={a.status !== "cancelado" ? `https://wa.me/${a.client_phone}?text=${encodeURIComponent(`Lembrete de agendamento Olá, ${a.client_name}! Passando para confirmar seu agendamento de 💇🏽‍♂️ ${a.service_names?.join(", ")} hoje às ${a.appointment_time.substring(0, 5)}⌚ — ${businessName}. Te aguardamos!`)}` : undefined}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={a.status === "cancelado" ? (e) => e.preventDefault() : undefined}
