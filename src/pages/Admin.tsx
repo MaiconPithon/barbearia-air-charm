@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppointments } from "@/hooks/useAppointments";
@@ -29,6 +29,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [filterDate, setFilterDate] = useState("");
+  const [activeTab, setActiveTab] = useState("appointments");
   const [planReportMonth, setPlanReportMonth] = useState(format(new Date(), "yyyy-MM"));
   const { data: allAppointments, refetch: refetchAppts } = useAppointments(filterDate || undefined);
   const { data: todayAppointments } = useAppointments(format(new Date(), "yyyy-MM-dd"));
@@ -259,14 +260,25 @@ const Admin = () => {
   const [qsPaymentStatus, setQsPaymentStatus] = useState("pago");
   const [qsDate, setQsDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [qsHour, setQsHour] = useState(format(new Date(), "HH"));
-  const [qsMinute, setQsMinute] = useState(() => {
-    const m = new Date().getMinutes();
-    if (m < 15) return "00";
-    if (m < 30) return "15";
-    if (m < 45) return "30";
-    return "45";
-  });
+  const [qsMinute, setQsMinute] = useState(format(new Date(), "mm"));
   const [qsSearch, setQsSearch] = useState("");
+
+  const syncQuickSaleDateTime = useCallback(() => {
+    const now = new Date();
+    setQsDate(format(now, "yyyy-MM-dd"));
+    setQsHour(format(now, "HH"));
+    setQsMinute(format(now, "mm"));
+  }, []);
+
+  useEffect(() => {
+    syncQuickSaleDateTime();
+  }, [syncQuickSaleDateTime]);
+
+  useEffect(() => {
+    if (activeTab === "quicksale") {
+      syncQuickSaleDateTime();
+    }
+  }, [activeTab, syncQuickSaleDateTime]);
 
   const qsTotalPrice = (() => {
     const catalog = services?.filter(s => qsServiceIds.includes(s.id)).reduce((sum, s) => sum + Number(s.price), 0) || 0;
@@ -378,7 +390,7 @@ const Admin = () => {
       </header>
 
       <div className="mx-auto max-w-6xl p-4">
-        <Tabs defaultValue="appointments">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6 w-full flex-wrap justify-start bg-card border border-border">
             <TabsTrigger value="appointments" className="relative">
               Agendamentos
@@ -453,7 +465,7 @@ const Admin = () => {
                     type="date"
                     value={filterDate}
                     onChange={(e) => setFilterDate(e.target.value)}
-                    className="w-auto bg-card text-white border border-border rounded-md [color-scheme:dark]"
+                    className="w-auto rounded-md border border-border bg-card text-foreground shadow-sm [color-scheme:dark] focus-visible:ring-2 focus-visible:ring-ring max-sm:min-h-11 max-sm:bg-card max-sm:text-foreground [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:invert"
                     placeholder="Filtrar por data"
                   />
                   {filterDate && (
@@ -565,22 +577,22 @@ const Admin = () => {
                 <label className="text-sm font-medium text-red-500 mb-2 block">Data e Hora do Atendimento</label>
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                    <CalendarIcon className="h-4 w-4 text-foreground" />
                     <Input
                       type="date"
                       value={qsDate}
                       onChange={(e) => setQsDate(e.target.value)}
-                      className="bg-background w-auto"
+                      className="w-auto rounded-md border border-border bg-card text-foreground shadow-sm [color-scheme:dark] focus-visible:ring-2 focus-visible:ring-ring max-sm:min-h-11 max-sm:bg-card max-sm:text-foreground [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:invert"
                     />
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <select value={qsHour} onChange={(e) => setQsHour(e.target.value)} className="rounded border border-border bg-background px-2 py-2 text-sm">
+                    <Clock className="h-4 w-4 text-foreground" />
+                    <select value={qsHour} onChange={(e) => setQsHour(e.target.value)} className="rounded-md border border-border bg-card px-2 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
                       {Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0")).map(h => <option key={h} value={h}>{h}</option>)}
                     </select>
-                    <span>:</span>
-                    <select value={qsMinute} onChange={(e) => setQsMinute(e.target.value)} className="rounded border border-border bg-background px-2 py-2 text-sm">
-                      {["00", "15", "30", "45"].map(m => <option key={m} value={m}>{m}</option>)}
+                    <span className="text-foreground">:</span>
+                    <select value={qsMinute} onChange={(e) => setQsMinute(e.target.value)} className="rounded-md border border-border bg-card px-2 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                      {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0")).map(m => <option key={m} value={m}>{m}</option>)}
                     </select>
                   </div>
                 </div>
@@ -619,7 +631,7 @@ const Admin = () => {
                         checked={qsServiceIds.includes(s.id)}
                         onCheckedChange={(c) => setQsServiceIds(prev => c ? [...prev, s.id] : prev.filter(id => id !== s.id))}
                       />
-                      <span className="flex-1 text-white font-medium">{s.name}</span>
+                      <span className="flex-1 text-white font-semibold">{s.name}</span>
                       <span className="text-sm font-bold" style={{ color: primaryColor }}>R$ {Number(s.price).toFixed(2)}</span>
                     </label>
                   ))}
