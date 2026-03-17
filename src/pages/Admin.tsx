@@ -577,22 +577,22 @@ const Admin = () => {
                 <label className="text-sm font-medium text-red-500 mb-2 block">Data e Hora do Atendimento</label>
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                    <CalendarIcon className="h-4 w-4 text-foreground" />
                     <Input
                       type="date"
                       value={qsDate}
                       onChange={(e) => setQsDate(e.target.value)}
-                      className="bg-background w-auto"
+                      className="w-auto rounded-md border border-border bg-card text-foreground shadow-sm [color-scheme:dark] focus-visible:ring-2 focus-visible:ring-ring max-sm:min-h-11 max-sm:bg-card max-sm:text-foreground [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:invert"
                     />
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <select value={qsHour} onChange={(e) => setQsHour(e.target.value)} className="rounded border border-border bg-background px-2 py-2 text-sm">
+                    <Clock className="h-4 w-4 text-foreground" />
+                    <select value={qsHour} onChange={(e) => setQsHour(e.target.value)} className="rounded-md border border-border bg-card px-2 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
                       {Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0")).map(h => <option key={h} value={h}>{h}</option>)}
                     </select>
-                    <span>:</span>
-                    <select value={qsMinute} onChange={(e) => setQsMinute(e.target.value)} className="rounded border border-border bg-background px-2 py-2 text-sm">
-                      {["00", "15", "30", "45"].map(m => <option key={m} value={m}>{m}</option>)}
+                    <span className="text-foreground">:</span>
+                    <select value={qsMinute} onChange={(e) => setQsMinute(e.target.value)} className="rounded-md border border-border bg-card px-2 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                      {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0")).map(m => <option key={m} value={m}>{m}</option>)}
                     </select>
                   </div>
                 </div>
