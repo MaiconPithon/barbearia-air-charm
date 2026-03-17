@@ -280,24 +280,41 @@ const Admin = () => {
     const totalDuration = catalogChosen.reduce((sum, s) => sum + s.duration, 0);
     const quickSalePaymentMethod =
       qsPaymentStatus === "plano" ? "plano" :
-        qsPaymentStatus === "pago" ? "Dinheiro" :
+        qsPaymentStatus === "pago" ? "dinheiro" :
           null;
 
-    await supabase.from("bookings" as any).insert({
-      client_name: qsName || "Venda Rápida",
+    const bookingTime = `${qsHour}:${qsMinute}:00`;
+
+    // Check for conflicts
+    const existing = allAppointments?.find(a =>
+      a.appointment_date === qsDate &&
+      a.appointment_time?.substring(0, 5) === `${qsHour}:${qsMinute}` &&
+      a.status !== "cancelado"
+    );
+    if (existing && !window.confirm(`⚠️ Já existe um agendamento às ${qsHour}:${qsMinute} para ${existing.client_name}. Deseja adicionar o encaixe mesmo assim?`)) {
+      return;
+    }
+
+    const { error } = await supabase.from("bookings" as any).insert({
+      client_name: qsName || "Encaixe",
       client_phone: "N/A",
       service_ids: qsServiceIds,
       service_names: allNames,
       booking_date: qsDate,
-      booking_time: `${qsHour}:${qsMinute}:00`,
-      status: qsPaymentStatus === "pago" ? "finalizado" : qsPaymentStatus === "plano" ? "finalizado" : "pendente",
+      booking_time: bookingTime,
+      status: "confirmado",
       payment_method: quickSalePaymentMethod,
       total_price: qsTotalPrice,
       total_duration: totalDuration,
     });
+    if (error) {
+      toast.error("Erro ao salvar encaixe: " + error.message);
+      return;
+    }
     setQsName(""); setQsServiceIds([]); setQsCustomServices([]);
+    qc.invalidateQueries({ queryKey: ["bookings"] });
     refetchAppts();
-    toast.success("Atendimento finalizado!");
+    toast.success("Encaixe adicionado na agenda!");
   };
 
   // Team actions
