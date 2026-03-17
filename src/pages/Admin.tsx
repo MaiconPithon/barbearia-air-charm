@@ -390,7 +390,7 @@ const Admin = () => {
       </header>
 
       <div className="mx-auto max-w-6xl p-4">
-        <Tabs defaultValue="appointments">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6 w-full flex-wrap justify-start bg-card border border-border">
             <TabsTrigger value="appointments" className="relative">
               Agendamentos
