@@ -465,7 +465,7 @@ const Admin = () => {
                     type="date"
                     value={filterDate}
                     onChange={(e) => setFilterDate(e.target.value)}
-                    className="w-auto bg-card text-white border border-border rounded-md [color-scheme:dark]"
+                    className="w-auto rounded-md border border-border bg-card text-foreground shadow-sm [color-scheme:dark] focus-visible:ring-2 focus-visible:ring-ring max-sm:min-h-11 max-sm:bg-card max-sm:text-foreground [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:invert"
                     placeholder="Filtrar por data"
                   />
                   {filterDate && (
