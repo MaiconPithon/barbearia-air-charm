@@ -259,7 +259,13 @@ const Admin = () => {
   const [qsPaymentStatus, setQsPaymentStatus] = useState("pago");
   const [qsDate, setQsDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [qsHour, setQsHour] = useState(format(new Date(), "HH"));
-  const [qsMinute, setQsMinute] = useState("00");
+  const [qsMinute, setQsMinute] = useState(() => {
+    const m = new Date().getMinutes();
+    if (m < 15) return "00";
+    if (m < 30) return "15";
+    if (m < 45) return "30";
+    return "45";
+  });
   const [qsSearch, setQsSearch] = useState("");
 
   const qsTotalPrice = (() => {
@@ -274,24 +280,41 @@ const Admin = () => {
     const totalDuration = catalogChosen.reduce((sum, s) => sum + s.duration, 0);
     const quickSalePaymentMethod =
       qsPaymentStatus === "plano" ? "plano" :
-        qsPaymentStatus === "pago" ? "Dinheiro" :
+        qsPaymentStatus === "pago" ? "dinheiro" :
           null;
 
-    await supabase.from("bookings" as any).insert({
-      client_name: qsName || "Venda Rápida",
+    const bookingTime = `${qsHour}:${qsMinute}:00`;
+
+    // Check for conflicts
+    const existing = allAppointments?.find(a =>
+      a.appointment_date === qsDate &&
+      a.appointment_time?.substring(0, 5) === `${qsHour}:${qsMinute}` &&
+      a.status !== "cancelado"
+    );
+    if (existing && !window.confirm(`⚠️ Já existe um agendamento às ${qsHour}:${qsMinute} para ${existing.client_name}. Deseja adicionar o encaixe mesmo assim?`)) {
+      return;
+    }
+
+    const { error } = await supabase.from("bookings" as any).insert({
+      client_name: qsName || "Encaixe",
       client_phone: "N/A",
       service_ids: qsServiceIds,
       service_names: allNames,
       booking_date: qsDate,
-      booking_time: `${qsHour}:${qsMinute}:00`,
-      status: qsPaymentStatus === "pago" ? "finalizado" : qsPaymentStatus === "plano" ? "finalizado" : "pendente",
+      booking_time: bookingTime,
+      status: "confirmado",
       payment_method: quickSalePaymentMethod,
       total_price: qsTotalPrice,
       total_duration: totalDuration,
     });
+    if (error) {
+      toast.error("Erro ao salvar encaixe: " + error.message);
+      return;
+    }
     setQsName(""); setQsServiceIds([]); setQsCustomServices([]);
+    qc.invalidateQueries({ queryKey: ["bookings"] });
     refetchAppts();
-    toast.success("Atendimento finalizado!");
+    toast.success("Encaixe adicionado na agenda!");
   };
 
   // Team actions
@@ -430,7 +453,7 @@ const Admin = () => {
                     type="date"
                     value={filterDate}
                     onChange={(e) => setFilterDate(e.target.value)}
-                    className="w-auto bg-muted text-foreground border-border"
+                    className="w-auto bg-card text-white border border-border rounded-md [color-scheme:dark]"
                     placeholder="Filtrar por data"
                   />
                   {filterDate && (
@@ -596,8 +619,8 @@ const Admin = () => {
                         checked={qsServiceIds.includes(s.id)}
                         onCheckedChange={(c) => setQsServiceIds(prev => c ? [...prev, s.id] : prev.filter(id => id !== s.id))}
                       />
-                      <span className="flex-1">{s.name}</span>
-                      <span className="text-sm font-medium" style={{ color: primaryColor }}>R$ {Number(s.price).toFixed(2)}</span>
+                      <span className="flex-1 text-white font-medium">{s.name}</span>
+                      <span className="text-sm font-bold" style={{ color: primaryColor }}>R$ {Number(s.price).toFixed(2)}</span>
                     </label>
                   ))}
                 </div>
@@ -650,7 +673,7 @@ const Admin = () => {
               </div>
 
               <Button onClick={handleQuickSale} disabled={qsServiceIds.length === 0 && qsCustomServices.length === 0} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-6 text-base">
-                <Zap className="mr-2 h-5 w-5" /> FINALIZAR ATENDIMENTO
+                <Zap className="mr-2 h-5 w-5" /> ADICIONAR ENCAIXE NA AGENDA
               </Button>
             </div>
           </TabsContent>
@@ -1181,8 +1204,8 @@ const Admin = () => {
                       checked={editServiceIds.includes(s.id)}
                       onCheckedChange={(c) => setEditServiceIds(prev => c ? [...prev, s.id] : prev.filter(id => id !== s.id))}
                     />
-                    <span className="flex-1">{s.name}</span>
-                    <span className="text-sm" style={{ color: primaryColor }}>R$ {Number(s.price).toFixed(2)}</span>
+                    <span className="flex-1 text-white font-medium">{s.name}</span>
+                    <span className="text-sm font-bold" style={{ color: primaryColor }}>R$ {Number(s.price).toFixed(2)}</span>
                   </label>
                 ))}
               </div>
