@@ -260,14 +260,25 @@ const Admin = () => {
   const [qsPaymentStatus, setQsPaymentStatus] = useState("pago");
   const [qsDate, setQsDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [qsHour, setQsHour] = useState(format(new Date(), "HH"));
-  const [qsMinute, setQsMinute] = useState(() => {
-    const m = new Date().getMinutes();
-    if (m < 15) return "00";
-    if (m < 30) return "15";
-    if (m < 45) return "30";
-    return "45";
-  });
+  const [qsMinute, setQsMinute] = useState(format(new Date(), "mm"));
   const [qsSearch, setQsSearch] = useState("");
+
+  const syncQuickSaleDateTime = useCallback(() => {
+    const now = new Date();
+    setQsDate(format(now, "yyyy-MM-dd"));
+    setQsHour(format(now, "HH"));
+    setQsMinute(format(now, "mm"));
+  }, []);
+
+  useEffect(() => {
+    syncQuickSaleDateTime();
+  }, [syncQuickSaleDateTime]);
+
+  useEffect(() => {
+    if (activeTab === "quicksale") {
+      syncQuickSaleDateTime();
+    }
+  }, [activeTab, syncQuickSaleDateTime]);
 
   const qsTotalPrice = (() => {
     const catalog = services?.filter(s => qsServiceIds.includes(s.id)).reduce((sum, s) => sum + Number(s.price), 0) || 0;
