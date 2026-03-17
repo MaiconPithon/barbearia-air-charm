@@ -29,6 +29,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [filterDate, setFilterDate] = useState("");
+  const [activeTab, setActiveTab] = useState("appointments");
   const [planReportMonth, setPlanReportMonth] = useState(format(new Date(), "yyyy-MM"));
   const { data: allAppointments, refetch: refetchAppts } = useAppointments(filterDate || undefined);
   const { data: todayAppointments } = useAppointments(format(new Date(), "yyyy-MM-dd"));
