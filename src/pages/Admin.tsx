@@ -619,8 +619,8 @@ const Admin = () => {
                         checked={qsServiceIds.includes(s.id)}
                         onCheckedChange={(c) => setQsServiceIds(prev => c ? [...prev, s.id] : prev.filter(id => id !== s.id))}
                       />
-                      <span className="flex-1">{s.name}</span>
-                      <span className="text-sm font-medium" style={{ color: primaryColor }}>R$ {Number(s.price).toFixed(2)}</span>
+                      <span className="flex-1 text-white font-medium">{s.name}</span>
+                      <span className="text-sm font-bold" style={{ color: primaryColor }}>R$ {Number(s.price).toFixed(2)}</span>
                     </label>
                   ))}
                 </div>
