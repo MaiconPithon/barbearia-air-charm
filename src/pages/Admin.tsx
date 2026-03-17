@@ -259,7 +259,13 @@ const Admin = () => {
   const [qsPaymentStatus, setQsPaymentStatus] = useState("pago");
   const [qsDate, setQsDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [qsHour, setQsHour] = useState(format(new Date(), "HH"));
-  const [qsMinute, setQsMinute] = useState("00");
+  const [qsMinute, setQsMinute] = useState(() => {
+    const m = new Date().getMinutes();
+    if (m < 15) return "00";
+    if (m < 30) return "15";
+    if (m < 45) return "30";
+    return "45";
+  });
   const [qsSearch, setQsSearch] = useState("");
 
   const qsTotalPrice = (() => {
