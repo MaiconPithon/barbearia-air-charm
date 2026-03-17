@@ -453,7 +453,7 @@ const Admin = () => {
                     type="date"
                     value={filterDate}
                     onChange={(e) => setFilterDate(e.target.value)}
-                    className="w-auto bg-muted text-foreground border-border"
+                    className="w-auto bg-card text-white border border-border rounded-md [color-scheme:dark]"
                     placeholder="Filtrar por data"
                   />
                   {filterDate && (
