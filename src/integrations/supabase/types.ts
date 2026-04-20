@@ -85,24 +85,36 @@ export type Database = {
           all_day: boolean
           blocked_date: string
           blocked_time: string | null
+          close_time: string | null
           created_at: string
           id: string
+          lunch_end: string | null
+          lunch_start: string | null
+          open_time: string | null
           reason: string | null
         }
         Insert: {
           all_day?: boolean
           blocked_date: string
           blocked_time?: string | null
+          close_time?: string | null
           created_at?: string
           id?: string
+          lunch_end?: string | null
+          lunch_start?: string | null
+          open_time?: string | null
           reason?: string | null
         }
         Update: {
           all_day?: boolean
           blocked_date?: string
           blocked_time?: string | null
+          close_time?: string | null
           created_at?: string
           id?: string
+          lunch_end?: string | null
+          lunch_start?: string | null
+          open_time?: string | null
           reason?: string | null
         }
         Relationships: []
@@ -174,18 +186,21 @@ export type Database = {
         Row: {
           client_name: string
           created_at: string
+          hidden: boolean
           id: string
           stars: number
         }
         Insert: {
           client_name: string
           created_at?: string
+          hidden?: boolean
           id?: string
           stars: number
         }
         Update: {
           client_name?: string
           created_at?: string
+          hidden?: boolean
           id?: string
           stars?: number
         }
