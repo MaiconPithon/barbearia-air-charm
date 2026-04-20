@@ -1,0 +1,1 @@
+INSERT INTO public.business_settings (key, value) VALUES ('shader_background', 'false') ON CONFLICT (key) DO NOTHING;
