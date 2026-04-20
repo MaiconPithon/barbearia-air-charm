@@ -1046,6 +1046,29 @@ const Admin = () => {
                 />
               </div>
 
+              {/* Animated Shader Background Toggle */}
+              <div className="rounded-lg border border-border bg-card p-5">
+                <h3 className="text-lg font-bold text-primary mb-2" style={{ fontFamily: 'DM Sans, sans-serif' }}>
+                  ✨ Fundo Animado (Shader WebGL)
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Quando ativado, substitui a imagem de fundo da página inicial por uma animação WebGL com linhas onduladas.
+                </p>
+                <div className="flex items-center gap-3">
+                  <Switch
+                    checked={settingsLocal.shader_background === "true"}
+                    onCheckedChange={(checked) => {
+                      const val = checked ? "true" : "false";
+                      setSettingsLocal(prev => ({ ...prev, shader_background: val }));
+                      saveSetting("shader_background", val);
+                    }}
+                  />
+                  <span className="text-sm font-medium">
+                    {settingsLocal.shader_background === "true" ? "Ativado" : "Desativado"}
+                  </span>
+                </div>
+              </div>
+
               {/* Logo */}
               <div className="rounded-lg border border-border bg-card p-5">
                 <h3 className="text-lg font-bold text-primary mb-4" style={{ fontFamily: 'Playfair Display, serif' }}>
