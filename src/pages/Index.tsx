@@ -4,6 +4,7 @@ import { useServices } from "@/hooks/useServices";
 import { useBusinessSettings } from "@/hooks/useBusinessSettings";
 import { useReviews } from "@/hooks/useReviews";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { WebGLShader } from "@/components/WebGLShader";
 import { Scissors, Star, MapPin, Clock, Phone, ChevronUp } from "lucide-react";
 import defaultLogo from "@/assets/default-logo.jpeg";
 import { useEffect } from "react";
