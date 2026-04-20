@@ -216,28 +216,71 @@ const Admin = () => {
     toast.success("Horário atualizado!");
   };
 
-  // Blocked slots
+  // Blocked slots / special-hours dialog
   const [blockDate, setBlockDate] = useState<Date | undefined>();
+  const [specialDialog, setSpecialDialog] = useState(false);
+  const [specialDate, setSpecialDate] = useState<string>("");
+  const [specialAllDay, setSpecialAllDay] = useState(false);
+  const [specialOpen, setSpecialOpen] = useState("08:00");
+  const [specialClose, setSpecialClose] = useState("18:00");
+  const [specialLunchStart, setSpecialLunchStart] = useState("");
+  const [specialLunchEnd, setSpecialLunchEnd] = useState("");
+  const [specialReason, setSpecialReason] = useState("");
 
-  const addBlock = async (date: Date) => {
+  const openSpecialDialog = (date: Date) => {
     const ds = format(date, "yyyy-MM-dd");
-    // Toggle: if already blocked, remove it
-    const existing = blockedSlots?.find(b => b.blocked_date === ds && b.all_day);
+    const existing: any = blockedSlots?.find(b => b.blocked_date === ds);
+    setSpecialDate(ds);
+    setSpecialAllDay(existing?.all_day ?? false);
+    setSpecialOpen(existing?.open_time?.substring(0, 5) || "08:00");
+    setSpecialClose(existing?.close_time?.substring(0, 5) || "18:00");
+    setSpecialLunchStart(existing?.lunch_start?.substring(0, 5) || "");
+    setSpecialLunchEnd(existing?.lunch_end?.substring(0, 5) || "");
+    setSpecialReason(existing?.reason || "");
+    setSpecialDialog(true);
+  };
+
+  const saveSpecialDay = async () => {
+    const existing = blockedSlots?.find(b => b.blocked_date === specialDate);
+    const payload: any = {
+      blocked_date: specialDate,
+      all_day: specialAllDay,
+      reason: specialReason || null,
+      open_time: specialAllDay ? null : specialOpen || null,
+      close_time: specialAllDay ? null : specialClose || null,
+      lunch_start: specialAllDay ? null : (specialLunchStart || null),
+      lunch_end: specialAllDay ? null : (specialLunchEnd || null),
+    };
     if (existing) {
-      await supabase.from("blocked_slots").delete().eq("id", existing.id);
+      await supabase.from("blocked_slots").update(payload).eq("id", existing.id);
     } else {
-      await supabase.from("blocked_slots").insert({
-        blocked_date: ds,
-        all_day: true,
-        reason: "Bloqueado pelo admin",
-      });
+      await supabase.from("blocked_slots").insert(payload);
     }
+    setSpecialDialog(false);
     refetchBlocked();
+    toast.success(specialAllDay ? "Data bloqueada!" : "Horário especial salvo!");
+  };
+
+  const quickBlockDate = async () => {
+    const existing = blockedSlots?.find(b => b.blocked_date === specialDate);
+    if (existing) {
+      await supabase.from("blocked_slots").update({ all_day: true, open_time: null, close_time: null, lunch_start: null, lunch_end: null }).eq("id", existing.id);
+    } else {
+      await supabase.from("blocked_slots").insert({ blocked_date: specialDate, all_day: true, reason: specialReason || "Bloqueado pelo admin" });
+    }
+    setSpecialDialog(false);
+    refetchBlocked();
+    toast.success("Data bloqueada!");
   };
 
   const isDateBlocked = (date: Date) => {
     const ds = format(date, "yyyy-MM-dd");
     return blockedSlots?.some(b => b.blocked_date === ds && b.all_day) || false;
+  };
+
+  const isDateSpecial = (date: Date) => {
+    const ds = format(date, "yyyy-MM-dd");
+    return blockedSlots?.some(b => b.blocked_date === ds && !b.all_day) || false;
   };
 
   // Business settings
@@ -402,6 +445,7 @@ const Admin = () => {
             <TabsTrigger value="schedule">Agenda</TabsTrigger>
             <TabsTrigger value="services">Serviços</TabsTrigger>
             <TabsTrigger value="plans"><FileText className="h-3.5 w-3.5 mr-1" />Planos</TabsTrigger>
+            <TabsTrigger value="reviews"><Star className="h-3.5 w-3.5 mr-1" />Avaliações</TabsTrigger>
             <TabsTrigger value="team">Equipe</TabsTrigger>
             <TabsTrigger value="appearance">Aparência</TabsTrigger>
             <TabsTrigger value="config">Config</TabsTrigger>
