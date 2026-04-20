@@ -779,19 +779,32 @@ const Admin = () => {
                 <Calendar
                   mode="single"
                   selected={blockDate}
-                  onSelect={(date) => { if (date) { addBlock(date); setBlockDate(undefined); } }}
+                  onSelect={(date) => { if (date) { openSpecialDialog(date); setBlockDate(undefined); } }}
                   locale={ptBR}
-                  modifiers={{ blocked: (date) => isDateBlocked(date) }}
-                  modifiersStyles={{ blocked: { backgroundColor: 'hsl(0, 62%, 30%)', color: 'white', borderRadius: '0.375rem' } }}
+                  modifiers={{ blocked: (date) => isDateBlocked(date), special: (date) => isDateSpecial(date) }}
+                  modifiersStyles={{
+                    blocked: { backgroundColor: 'hsl(0, 62%, 30%)', color: 'white', borderRadius: '0.375rem' },
+                    special: { backgroundColor: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))', borderRadius: '0.375rem' },
+                  }}
                   className="pointer-events-auto"
                 />
                 {blockedSlots && blockedSlots.length > 0 && (
-                  <div className="mt-4 space-y-1">
-                    {blockedSlots.map(b => (
-                      <div key={b.id} className="flex items-center justify-between text-sm">
-                        <span>{b.blocked_date} {b.reason && `— ${b.reason}`}</span>
-                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => { supabase.from("blocked_slots").delete().eq("id", b.id).then(() => refetchBlocked()); }}>
-                          <Trash2 className="h-3 w-3" />
+                  <div className="mt-4 space-y-2">
+                    <div className="text-xs font-bold text-primary uppercase tracking-wider">Horários Especiais / Bloqueios:</div>
+                    {blockedSlots.map((b: any) => (
+                      <div key={b.id} className="flex items-center justify-between gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-foreground">{format(new Date(b.blocked_date + "T00:00:00"), "dd/MM/yyyy")}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {b.all_day ? "🚫 Dia inteiro bloqueado" : `${b.open_time?.substring(0,5) || "—"} - ${b.close_time?.substring(0,5) || "—"}${b.lunch_start ? ` | Pausa: ${b.lunch_start.substring(0,5)}-${b.lunch_end?.substring(0,5)}` : ""}`}
+                            {b.reason && ` — ${b.reason}`}
+                          </div>
+                        </div>
+                        <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => openSpecialDialog(new Date(b.blocked_date + "T00:00:00"))}>
+                          <Edit2 className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => { supabase.from("blocked_slots").delete().eq("id", b.id).then(() => refetchBlocked()); }}>
+                          <Trash2 className="h-3.5 w-3.5 text-red-400" />
                         </Button>
                       </div>
                     ))}
