@@ -7,6 +7,7 @@ import { useScheduleConfig } from "@/hooks/useScheduleConfig";
 import { useBlockedSlots } from "@/hooks/useBlockedSlots";
 import { useBusinessSettings } from "@/hooks/useBusinessSettings";
 import { useAvaliacoes } from "@/hooks/useAvaliacoes";
+import { useReviews } from "@/hooks/useReviews";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,19 @@ const Admin = () => {
   const { data: blockedSlots, refetch: refetchBlocked } = useBlockedSlots();
   const { data: settings, refetch: refetchSettings } = useBusinessSettings();
   const { data: avaliacoes } = useAvaliacoes();
+  const { data: allReviews, refetch: refetchReviews } = useReviews({ includeHidden: true });
+  const [reviewsFilter, setReviewsFilter] = useState<string>("all");
+
+  const toggleReviewHidden = async (id: string, hidden: boolean) => {
+    await supabase.from("reviews" as any).update({ hidden: !hidden }).eq("id", id);
+    refetchReviews();
+    toast.success(!hidden ? "Avaliação ocultada." : "Avaliação visível.");
+  };
+
+  const filteredReviews = (allReviews || []).filter(r => {
+    if (reviewsFilter === "all") return true;
+    return String(r.stars) === reviewsFilter;
+  });
 
   // Team state
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
