@@ -73,16 +73,8 @@ const Index = () => {
             {businessName}
           </h1>
 
-          {/* Star rating badge */}
-          {reviews && reviews.length > 0 && (
-            <div className="flex items-center gap-1.5 mb-4 scale-90">
-              <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm border border-white/5 px-2.5 py-1 rounded-full">
-                <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                <span className="text-[11px] font-black text-white">{avgRating.toFixed(1)}</span>
-                <span className="text-[9px] text-white/30 font-bold uppercase tracking-tighter ml-0.5">({reviews.length})</span>
-              </div>
-            </div>
-          )}
+          {/* Spacer (rating moved to WhatsApp button) */}
+          <div className="mb-4" />
 
           {/* Main CTA */}
           <Link to="/agendar" className="w-full max-w-[240px] mb-5 group">
