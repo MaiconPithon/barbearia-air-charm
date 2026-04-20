@@ -975,6 +975,72 @@ const Admin = () => {
             </div>
           </TabsContent>
 
+          {/* ===== REVIEWS TAB ===== */}
+          <TabsContent value="reviews">
+            <div className="rounded-lg border border-border bg-card p-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                <h3 className="text-lg font-bold text-primary flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  <Star className="h-5 w-5" /> Gerenciar Avaliações
+                </h3>
+                <Select value={reviewsFilter} onValueChange={setReviewsFilter}>
+                  <SelectTrigger className="w-full sm:w-44 bg-background"><SelectValue /></SelectTrigger>
+                  <SelectContent className="dark">
+                    <SelectItem value="all">Todas as notas</SelectItem>
+                    <SelectItem value="5">★★★★★ (5)</SelectItem>
+                    <SelectItem value="4">★★★★ (4)</SelectItem>
+                    <SelectItem value="3">★★★ (3)</SelectItem>
+                    <SelectItem value="2">★★ (2)</SelectItem>
+                    <SelectItem value="1">★ (1)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {filteredReviews.length === 0 ? (
+                <p className="text-center text-muted-foreground py-12">Nenhuma avaliação encontrada.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-primary">Cliente</TableHead>
+                        <TableHead className="text-primary">Data</TableHead>
+                        <TableHead className="text-primary">Nota</TableHead>
+                        <TableHead className="text-primary">Status</TableHead>
+                        <TableHead className="text-primary text-right">Ação</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredReviews.map((r) => (
+                        <TableRow key={r.id} className={r.hidden ? "opacity-50" : ""}>
+                          <TableCell className="font-semibold text-foreground">{r.client_name}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{format(new Date(r.created_at), "dd/MM/yyyy HH:mm")}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((i) => (
+                                <Star key={i} className={cn("h-4 w-4", i <= r.stars ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30")} />
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {r.hidden ? (
+                              <span className="inline-flex items-center rounded-full border border-red-500/40 bg-red-500/10 px-2 py-0.5 text-xs font-semibold text-red-400">Oculta</span>
+                            ) : (
+                              <span className="inline-flex items-center rounded-full border border-green-500/40 bg-green-500/10 px-2 py-0.5 text-xs font-semibold text-green-400">Visível</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button size="sm" variant="ghost" onClick={() => toggleReviewHidden(r.id, r.hidden)} className="gap-1.5">
+                              {r.hidden ? "👁 Mostrar" : "🚫 Ocultar"}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
           {/* ===== TEAM TAB ===== */}
           <TabsContent value="team">
             <div className="max-w-2xl mx-auto space-y-6">
@@ -1388,6 +1454,60 @@ const Admin = () => {
               <Input placeholder="Ex: 45" type="number" value={sDuration} onChange={(e) => setSDuration(e.target.value)} className="bg-zinc-800 text-white border-border focus:border-yellow-500" style={{ color: 'white' }} />
             </div>
             <Button onClick={saveService} className="w-full">Salvar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Special Hours / Block Date Dialog */}
+      <Dialog open={specialDialog} onOpenChange={setSpecialDialog}>
+        <DialogContent className="dark max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-primary" style={{ fontFamily: 'Playfair Display, serif' }}>
+              Horário Especial — {specialDate && format(new Date(specialDate + "T00:00:00"), "dd/MM/yyyy")}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Switch checked={specialAllDay} onCheckedChange={setSpecialAllDay} />
+              <span className="font-semibold text-foreground">Bloquear dia inteiro</span>
+            </div>
+
+            {!specialAllDay && (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-bold text-primary mb-1 block uppercase tracking-wider">Abertura</label>
+                    <Input type="time" value={specialOpen} onChange={(e) => setSpecialOpen(e.target.value)} className="bg-background text-foreground [color-scheme:dark]" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-primary mb-1 block uppercase tracking-wider">Fechamento</label>
+                    <Input type="time" value={specialClose} onChange={(e) => setSpecialClose(e.target.value)} className="bg-background text-foreground [color-scheme:dark]" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-primary mb-1 block uppercase tracking-wider">Início Pausa</label>
+                    <Input type="time" value={specialLunchStart} onChange={(e) => setSpecialLunchStart(e.target.value)} className="bg-background text-foreground [color-scheme:dark]" placeholder="--:--" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-primary mb-1 block uppercase tracking-wider">Fim Pausa</label>
+                    <Input type="time" value={specialLunchEnd} onChange={(e) => setSpecialLunchEnd(e.target.value)} className="bg-background text-foreground [color-scheme:dark]" placeholder="--:--" />
+                  </div>
+                </div>
+              </>
+            )}
+
+            <div>
+              <label className="text-xs font-bold text-foreground mb-1 block">Motivo (opcional)</label>
+              <Input value={specialReason} onChange={(e) => setSpecialReason(e.target.value)} placeholder="Ex: Feriado, evento especial" className="bg-background text-foreground" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              <Button onClick={saveSpecialDay} className="text-black font-bold" style={{ backgroundColor: primaryColor }}>
+                Salvar
+              </Button>
+              <Button variant="outline" onClick={() => setSpecialDialog(false)}>
+                Cancelar
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
